@@ -13,6 +13,10 @@
 # need to require the rest-client gem. It may be a good idea to also require
 # pry if you plan on debugging. Do so below this line:
 
+require 'rest-client'
+require 'json'
+require 'pry'
+
 # This is the exact same method that we had from lesson 3. What's great about
 # well written methods is that they can be easily transported from program to
 # program if they're abstract enough. There should be no need to edit this
@@ -33,9 +37,20 @@ end
 #   2. http://reddit.com/r/worldnews.json
 #   3. http://reddit.com/.json
 
-# Now that we have the address of the website that we want to get, let's use
-# `RestClient`'s `.get` method in order to download the url and let's store that
-# in a variable called `response`.
+
+url =  'http://reddit.com/r/worldnews.json'
+response = RestClient.get(url)
+parsed_response = JSON.parse(response)
+
+posts = parsed_response['data']['children'].map do |post|
+    title = post ['data']['title']
+    category = post ['data']['subreddit']
+    upvotes = calculate_upvotes(title, category)
+    { title: title, category: category, upvotes: upvotes }
+    
+end
+
+
 
 # Let's continue by parsing the string that came back from RestClient (which we
 # stored in `response`), using `JSON`'s `.parse` method, and store that in a
@@ -82,11 +97,11 @@ end
   # the keys equal to the variables that you defined above (`title`, `category`
   # and `upvotes`), so those will need to be defined in order for this line to
   # work
-  post = { title: title, category: category, upvotes: upvotes }
+  # post = { title: title, category: category, upvotes: upvotes }
 
   # Lastly, this line will add the new hash into the empty `posts` array that
   # you defined above
-  posts << post
+  # posts << post
 
 # Be sure to end your loop here.
 
